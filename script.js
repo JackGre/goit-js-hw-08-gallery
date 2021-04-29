@@ -1,13 +1,13 @@
 import images from "./gallery-items.js";
 
 const body = document.querySelector('body');
-console.log(body);
+//console.log(body);
 const galleryEl = document.querySelector('.js-gallery');
-console.log(galleryEl);
+//console.log(galleryEl);
 const modalWindowImage = document.querySelector('.js-lightbox');
-console.log(modalWindowImage);
+//console.log(modalWindowImage);
 const imageZoom = document.querySelector('.lightbox__image')
-console.log(imageZoom);
+//console.log(imageZoom);
 
 
 
@@ -23,7 +23,7 @@ function addGalleryImage(images) {
             class="gallery__image"
             src="${image.preview}"
             data-source="${image.original}"
-            data-namber="${index}"
+            data-number=${index}
             alt="${image.description}"
         />
         </a>
@@ -34,7 +34,7 @@ function addGalleryImage(images) {
 }
 
 galleryEl.addEventListener('click', onClickImage);
-console.log(galleryEl)
+//console.log(galleryEl)
 
 function onClickImage(event) {
     event.preventDefault();
@@ -48,63 +48,76 @@ function onClickImage(event) {
     imageZoom.alt = eventClick.dataset.source;
     imageZoom.dataset.number = eventClick.dataset.number;
 
-    /*window.addEventListener('keydown', onModalClosePush);
-    window.addEventListener('keydown', onModalPrevImgPush);
-    window.addEventListener('keydown', onModalNextImgPush);*/
-};
-
-
-
-/*const refs = {
-body: document.querySelector('body'),
-galleryList: document.querySelector('.js-gallery'),
-modalWindow: document.querySelector('.js-lightbox'),
-zoomedImage: document.querySelector('.lightbox__image'),
-};
-const { body, galleryList, modalWindow, zoomedImage } = refs;
-
-createImagesMarkup(images);
-galleryList.addEventListener('click', onImageClick);
-//modalWindow.addEventListener('click', onModalCloseClick);
-
-
-function createImagesMarkup(images) {
-    const imagesMarkup = images.map((image, i) => {
-        return `<li class="gallery_item">
-    <a class="gallery__link"
-    href="${image.original}"
-  >
-    <img
-      class="gallery__image"
-      src="${image.preview}"
-      data-source="${image.original}"
-      data-number = ${i}
-      alt="${image.description}"
-    />
-  </a>
-  </li>`;
-    }).join('');
+    window.addEventListener('keydown', modalClosePush);
+    window.addEventListener('keydown', modalPreviousImgPush);
+    window.addEventListener('keydown', modalNextImgPush);
     
-    galleryList.insertAdjacentHTML('afterbegin', imagesMarkup);
+};
+
+
+
+
+modalWindowImage.addEventListener('click', modalCloseBtn)
+function modalCloseBtn(event) {
+    //console.log(event.target)
+
+    if(!event.target.classList.contains('lightbox__button')
+     && 
+     !event.target.classList.contains('lightbox__overlay')) {
+        return;
+    }
+
+    closeModal();
+};
+
+
+
+function modalClosePush (event) {
+    if (event.key !== 'Escape') {
+            return;
+        }    
+        closeModal();
+    };
+
+function modalPreviousImgPush(event) {
+    const indexImage = imageZoom.dataset.number;
+  
+    const previousImg = document.querySelector(`img[data-number='${indexImage - 1}']`);
+    
+    if (event.key !== 'ArrowLeft' || previousImg === null) {
+            return;
+    }
+     
+    imageZoom.src = previousImg.dataset.source;
+    imageZoom.alt = previousImg.dataset.source;
+    imageZoom.dataset.number = previousImg.dataset.number;    
+    
+    
 }
 
 
 
-function onImageClick(evt) {
-   evt.preventDefault();
-    if (evt.target.nodeName !== 'IMG') {
+function modalNextImgPush(event) {
+    const indexImage = imageZoom.dataset.number;
+    const nextImg = document.querySelector(`img[data-number='${Number(indexImage) + 1}']`);
+
+   if (event.key !== 'ArrowRight' || nextImg === null) {
         return;
     }
 
-    modalWindow.classList.toggle('is-open');
-    body.classList.toggle('is-fixed');
-    zoomedImage.src = evt.target.dataset.source;
-    zoomedImage.alt = evt.target.dataset.source;
-    zoomedImage.dataset.number = evt.target.dataset.number;
+    imageZoom.src = nextImg.dataset.source;
+    imageZoom.alt = nextImg.dataset.source;
+    imageZoom.dataset.number = nextImg.dataset.number;
+} 
 
-/*window.addEventListener('keydown', onModalClosePush);
-window.addEventListener('keydown', onModalPrevImgPush);
-window.addEventListener('keydown', onModalNextImgPush);
-    
-}*/
+function closeModal() {
+    modalWindowImage.classList.toggle('is-open');
+    body.classList.toggle('is-fixed');
+    imageZoom.src = '';
+    imageZoom.alt = '';
+
+    window.removeEventListener('keydown', modalClosePush);
+    window.removeEventListener('keydown', modalPreviousImgPush);
+    window.removeEventListener('keydown', modalNextImgPush);
+};
 
